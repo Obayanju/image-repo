@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -44,11 +45,20 @@ func unmarshalJSON(byt []byte) map[string]interface{} {
 	return dat
 }
 
-func getImage(category string) []image {
+//  getImage queries the Pixabay API and returns results images matching
+// category
+func getImage(category, results string) []image {
+	i, err := strconv.Atoi(results)
+	if err != nil {
+		log.Fatalf("cannot convert %s to an int: %v", results, err)
+	}
+	if i < 3 {
+		results = "3"
+	}
 	param := url.Values{}
 	param.Set("key", API_KEY)
 	param.Set("category", category)
-	param.Set("per_page", "3")
+	param.Set("per_page", results)
 	queryString := param.Encode()
 
 	url := fmt.Sprintf("%s?%s", PixabayURL, queryString)
@@ -73,9 +83,15 @@ func getImage(category string) []image {
 }
 
 func main() {
-	category := "fashion"
+	categories := [][]string{
+		[]string{"fashion", "5"},
+		[]string{"nature", "5"},
+		[]string{"sports", "3"},
+	}
 	var images []image
-	images = append(images, getImage(category)...)
+	for _, category := range categories {
+		images = append(images, getImage(category[0], category[1])...)
+	}
 	for _, img := range images {
 		fmt.Printf("%s %v\n", img.url, strings.Join(img.tags, ","))
 	}
