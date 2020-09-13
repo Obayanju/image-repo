@@ -4,6 +4,9 @@ import (
 	"bufio"
 	"log"
 	"os"
+
+	"github.com/obayanju/image-repo/generateimage"
+	"github.com/obayanju/image-repo/graph"
 )
 
 const IMAGEINFODIR = "./images.txt"
@@ -28,5 +31,8 @@ func readFile(path string) []string {
 }
 
 func main() {
+	var graph graph.Graph
+	var images []generateimage.Image
+
 	data := readFile(IMAGEINFODIR)
 }

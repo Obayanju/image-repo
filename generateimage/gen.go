@@ -1,4 +1,4 @@
-package main
+package generateimage
 
 import (
 	"encoding/json"
@@ -18,9 +18,9 @@ const (
 	PixabayURL = "https://pixabay.com/api/"
 )
 
-type image struct {
-	url  string
-	tags []string
+type Image struct {
+	Url  string
+	Tags []string
 }
 
 func getDataFromURL(url string) []byte {
@@ -47,7 +47,7 @@ func unmarshalJSON(byt []byte) map[string]interface{} {
 
 //  getImage queries the Pixabay API and returns results images matching
 // category
-func getImage(category, results string) []image {
+func getImage(category, results string) []Image {
 	i, err := strconv.Atoi(results)
 	if err != nil {
 		log.Fatalf("cannot convert %s to an int: %v", results, err)
@@ -67,32 +67,32 @@ func getImage(category, results string) []image {
 	jsonData := unmarshalJSON(byt)
 	hits := jsonData["hits"].([]interface{})
 
-	images := []image{}
+	images := []Image{}
 	for _, v := range hits {
 		v := v.(map[string]interface{})
 		tags := strings.Split(v["tags"].(string), ",")
 		tags = append(tags, category)
 
-		img := image{
-			url:  v["previewURL"].(string),
-			tags: tags,
+		img := Image{
+			Url:  v["previewURL"].(string),
+			Tags: tags,
 		}
 		images = append(images, img)
 	}
 	return images
 }
 
-func main() {
+func GenerateImages() {
 	categories := [][]string{
 		[]string{"fashion", "5"},
 		[]string{"nature", "5"},
 		[]string{"sports", "3"},
 	}
-	var images []image
+	var images []Image
 	for _, category := range categories {
 		images = append(images, getImage(category[0], category[1])...)
 	}
 	for _, img := range images {
-		fmt.Printf("%s %v\n", img.url, strings.Join(img.tags, ","))
+		fmt.Printf("%s->%v\n", img.Url, strings.Join(img.Tags, ","))
 	}
 }

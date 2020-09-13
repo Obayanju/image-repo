@@ -7,7 +7,7 @@ type Graph struct {
 }
 
 func (g *Graph) AddEdge(key, value string) {
-	g.edges[key] = append(values, value)
+	g.edges[key] = append(g.edges[key], value)
 }
 
 func (g *Graph) GetValues(key string) []string {
