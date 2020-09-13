@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 var API_KEY = os.Getenv("PIXABAY_KEY")
@@ -38,7 +39,12 @@ func unmarshalJSON(byt []byte) map[string]interface{} {
 	return dat
 }
 
-func getImage(category, downloadDir string) error {
+type image struct {
+	url  string
+	tags []string
+}
+
+func getImage(category string) []image {
 	param := url.Values{}
 	param.Set("key", API_KEY)
 	param.Set("category", category)
@@ -46,17 +52,31 @@ func getImage(category, downloadDir string) error {
 	queryString := param.Encode()
 
 	url := fmt.Sprintf("%s?%s", PixabayURL, queryString)
-	fmt.Println(url)
 	byt := getDataFromURL(url)
 
 	jsonData := unmarshalJSON(byt)
-	return nil
+	hits := jsonData["hits"].([]interface{})
+
+	images := []image{}
+	for _, v := range hits {
+		v := v.(map[string]interface{})
+		tags := strings.Split(v["tags"].(string), ",")
+		tags = append(tags, category)
+
+		img := image{
+			url:  v["previewURL"].(string),
+			tags: tags,
+		}
+		images = append(images, img)
+	}
+	return images
 }
 
 func main() {
 	category := "fashion"
-	downloadDir := "."
-	if err := getImage(category, downloadDir); err != nil {
-		log.Fatalf("There was an error downloading an image -> %v", err)
+	var images []image
+	images = append(images, getImage(category)...)
+	for _, img := range images {
+		fmt.Printf("%s %v\n", img.url, strings.Join(img.tags, ","))
 	}
 }
