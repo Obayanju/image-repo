@@ -17,6 +17,11 @@ const (
 	PixabayURL = "https://pixabay.com/api/"
 )
 
+type image struct {
+	url  string
+	tags []string
+}
+
 func getDataFromURL(url string) []byte {
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != 200 {
@@ -37,11 +42,6 @@ func unmarshalJSON(byt []byte) map[string]interface{} {
 		log.Fatal(err)
 	}
 	return dat
-}
-
-type image struct {
-	url  string
-	tags []string
 }
 
 func getImage(category string) []image {
