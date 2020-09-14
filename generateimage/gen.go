@@ -15,7 +15,8 @@ import (
 var API_KEY = os.Getenv("PIXABAY_KEY")
 
 const (
-	PixabayURL = "https://pixabay.com/api/"
+	PixabayURL   = "https://pixabay.com/api/"
+	IMAGEINFODIR = "./images.txt"
 )
 
 type Image struct {
@@ -82,6 +83,18 @@ func getImage(category, results string) []Image {
 	return images
 }
 
+func appendToFile(fName, body string) {
+	f, err := os.OpenFile(fName,
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Println(err)
+	}
+	defer f.Close()
+	if _, err := f.Write([]byte(body)); err != nil {
+		log.Println(err)
+	}
+}
+
 func GenerateImages() {
 	categories := [][]string{
 		[]string{"fashion", "5"},
@@ -93,6 +106,7 @@ func GenerateImages() {
 		images = append(images, getImage(category[0], category[1])...)
 	}
 	for _, img := range images {
-		fmt.Printf("%s->%v\n", img.Url, strings.Join(img.Tags, ","))
+		content := fmt.Sprintf("%s->%v\n", img.Url, strings.Join(img.Tags, ","))
+		appendToFile(IMAGEINFODIR, content)
 	}
 }
