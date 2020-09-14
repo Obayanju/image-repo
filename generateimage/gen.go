@@ -95,16 +95,29 @@ func appendToFile(fName, body string) {
 	}
 }
 
+func truncate(filename string, perm os.FileMode) error {
+	f, err := os.OpenFile(filename, os.O_TRUNC|os.O_CREATE, perm)
+	if err != nil {
+		return fmt.Errorf("could not open file %q for truncation: %v", filename, err)
+	}
+	if err = f.Close(); err != nil {
+		return fmt.Errorf("could not close file handler for %q after truncation: %v", filename, err)
+	}
+	return nil
+}
+
 func GenerateImages() {
 	categories := [][]string{
-		[]string{"fashion", "5"},
-		[]string{"nature", "5"},
-		[]string{"sports", "3"},
+		[]string{"nature", "10"},
+		[]string{"woman", "10"},
+		[]string{"sports", "10"},
 	}
 	var images []Image
 	for _, category := range categories {
 		images = append(images, getImage(category[0], category[1])...)
 	}
+
+	truncate(IMAGEINFODIR, 0644)
 	for _, img := range images {
 		content := fmt.Sprintf("%s->%v\n", img.Url, strings.Join(img.Tags, ","))
 		appendToFile(IMAGEINFODIR, content)

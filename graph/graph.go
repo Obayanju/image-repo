@@ -10,9 +10,6 @@ func (g *Graph) AddEdge(key, value string) {
 	if g.edges == nil {
 		g.edges = make(map[string][]string)
 	}
-	if _, ok := g.edges[key]; ok {
-		return
-	}
 	g.edges[key] = append(g.edges[key], value)
 }
 

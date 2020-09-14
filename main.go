@@ -31,6 +31,7 @@ func readFile(path string) []string {
 }
 
 func main() {
+	//generateimage.GenerateImages()
 	var graph graph.Graph
 
 	data := readFile(IMAGEINFODIR)
@@ -43,4 +44,5 @@ func main() {
 			graph.AddEdge(tag, url)
 		}
 	}
+	graph.String()
 }
