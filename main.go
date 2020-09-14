@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -30,12 +31,9 @@ func readFile(path string) []string {
 	return out
 }
 
-func main() {
-	//generateimage.GenerateImages()
-	var graph graph.Graph
-
-	data := readFile(IMAGEINFODIR)
-	for _, line := range data {
+// adds the images and tags from the text file to the graph
+func addImageTagToGraph(lines []string, graph *graph.Graph) {
+	for _, line := range lines {
 		parts := strings.Split(line, "->")
 		url := parts[0]
 		tags := strings.Split(parts[1], ",")
@@ -44,5 +42,25 @@ func main() {
 			graph.AddEdge(tag, url)
 		}
 	}
-	graph.String()
+}
+
+func getImageMatch(tags []string, graph *graph.Graph) []string {
+	imageMatches := []string{}
+	for _, tag := range tags {
+		sets := graph.GetValues(tag)
+		if sets != nil {
+			imageMatches = append(imageMatches, sets.Items()...)
+		}
+	}
+	return imageMatches
+}
+
+func main() {
+	var graph graph.Graph
+
+	data := readFile(IMAGEINFODIR)
+	addImageTagToGraph(data, &graph)
+
+	tags := []string{"nature", "volleyball", "mountain", "sunset", "fashion"}
+	fmt.Println(getImageMatch(tags, &graph))
 }

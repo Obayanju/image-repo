@@ -71,7 +71,7 @@ func getImage(category, results string) []Image {
 	images := []Image{}
 	for _, v := range hits {
 		v := v.(map[string]interface{})
-		tags := strings.Split(v["tags"].(string), ",")
+		tags := strings.Split(v["tags"].(string), ", ")
 		tags = append(tags, category)
 
 		img := Image{

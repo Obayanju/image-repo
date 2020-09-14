@@ -4,13 +4,21 @@ type StringSet struct {
 	items map[string]bool
 }
 
-func (set *StringSet) Add(s string) {
-	if set.items == nil {
-		set.items = make(map[string]bool)
+func (s *StringSet) Add(str string) {
+	if s.items == nil {
+		s.items = make(map[string]bool)
 	}
 
-	_, found := set.items[s]
+	_, found := s.items[str]
 	if !found {
-		set.items[s] = true
+		s.items[str] = true
 	}
+}
+
+func (s *StringSet) Items() []string {
+	items := []string{}
+	for i := range s.items {
+		items = append(items, i)
+	}
+	return items
 }
