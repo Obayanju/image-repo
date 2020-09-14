@@ -1,19 +1,27 @@
 package graph
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/obayanju/image-repo/set"
+)
 
 type Graph struct {
-	edges map[string][]string
+	edges map[string]*set.StringSet
 }
 
 func (g *Graph) AddEdge(key, value string) {
 	if g.edges == nil {
-		g.edges = make(map[string][]string)
+		g.edges = make(map[string]*set.StringSet)
 	}
-	g.edges[key] = append(g.edges[key], value)
+
+	if g.edges[key] == nil {
+		g.edges[key] = &set.StringSet{}
+	}
+	g.edges[key].Add(value)
 }
 
-func (g *Graph) GetValues(key string) []string {
+func (g *Graph) GetValues(key string) *set.StringSet {
 	return g.edges[key]
 }
 
