@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"log"
 	"os"
+	"strings"
 
-	"github.com/obayanju/image-repo/generateimage"
 	"github.com/obayanju/image-repo/graph"
 )
 
@@ -32,7 +32,15 @@ func readFile(path string) []string {
 
 func main() {
 	var graph graph.Graph
-	var images []generateimage.Image
 
 	data := readFile(IMAGEINFODIR)
+	for _, line := range data {
+		parts := strings.Split(line, "->")
+		url := parts[0]
+		tags := strings.Split(parts[1], ",")
+
+		for _, tag := range tags {
+			graph.AddEdge(tag, url)
+		}
+	}
 }
