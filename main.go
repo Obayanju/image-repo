@@ -2,11 +2,11 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"strings"
 
+	"github.com/gofiber/fiber"
 	"github.com/obayanju/image-repo/graph"
 	"github.com/obayanju/image-repo/set"
 )
@@ -15,6 +15,10 @@ const IMAGEINFODIR = "./images.txt"
 
 type ImageTags struct {
 	items map[string]*set.StringSet
+}
+
+type Params struct {
+	Tags []string `query:"tags"`
 }
 
 func readFile(path string) []string {
@@ -75,10 +79,29 @@ func main() {
 	data := readFile(IMAGEINFODIR)
 	addImageTagToGraph(data, &graph)
 
-	tags := []string{"nature", "volleyball", "mountains", "sunset", "fashion"}
-	imageMatches := ImageTags{}
-	imageMatches = getImageMatch(tags, &graph)
-	for url, tagSet := range imageMatches.items {
-		fmt.Printf("%s -> %v\n", url, tagSet.Items())
-	}
+	app := fiber.New()
+	app.Get("/", func(c *fiber.Ctx) error {
+		params := new(Params)
+
+		if err := c.QueryParser(params); err != nil {
+			return err
+		}
+
+		// workaround for a bug in fiber
+		// https://github.com/gofiber/fiber/issues/782
+		if len(params.Tags) == 1 {
+			params.Tags = strings.Split(params.Tags[0], ",")
+		}
+
+		urlTagMap := fiber.Map{}
+		imageMatches := ImageTags{}
+		imageMatches = getImageMatch(params.Tags, &graph)
+		for url, tagSet := range imageMatches.items {
+			urlTagMap[url] = tagSet.Items()
+		}
+
+		return c.JSON(urlTagMap)
+	})
+
+	app.Listen(":3000")
 }
