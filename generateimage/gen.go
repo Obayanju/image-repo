@@ -106,12 +106,13 @@ func truncate(filename string, perm os.FileMode) error {
 	return nil
 }
 
-func GenerateImages() {
-	categories := [][]string{
-		[]string{"nature", "10"},
-		[]string{"woman", "10"},
-		[]string{"sports", "10"},
+func GenerateImages(tags []string, amount []int) {
+	categories := [][]string{}
+	for i, tag := range tags {
+		tagAmount := []string{tag, strconv.Itoa(amount[i])}
+		categories = append(categories, tagAmount)
 	}
+
 	var images []Image
 	for _, category := range categories {
 		images = append(images, getImage(category[0], category[1])...)

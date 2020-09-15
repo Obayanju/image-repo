@@ -2,11 +2,15 @@ package main
 
 import (
 	"bufio"
+	"flag"
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/gofiber/fiber"
+	"github.com/obayanju/image-repo/generateimage"
 	"github.com/obayanju/image-repo/graph"
 	"github.com/obayanju/image-repo/set"
 )
@@ -73,7 +77,7 @@ func getImageMatch(tags []string, graph *graph.Graph) ImageTags {
 	return imageMatches
 }
 
-func main() {
+func startServer() {
 	var graph graph.Graph
 
 	data := readFile(IMAGEINFODIR)
@@ -104,4 +108,47 @@ func main() {
 	})
 
 	app.Listen(":3000")
+
+}
+
+func main() {
+	var tags, amount string
+	var runServer bool
+
+	flag.StringVar(&tags, "tags", "nature", "tags of images to match\nvalue must be comma sepearated with no space")
+	flag.StringVar(&amount, "amount", "10", "number of images of each tag to generate\nvalue must be comma sepearated with no space")
+	flag.BoolVar(&runServer, "run", false, "run server")
+
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
+		flag.PrintDefaults()
+	}
+
+	flag.Parse()
+	var tagSl []string
+	var amountSl []int
+	if tags != "" {
+		tagSl = strings.Split(tags, ",")
+	}
+	if amount != "" {
+		for _, v := range strings.Split(amount, ",") {
+			i, err := strconv.Atoi(v)
+			if err != nil {
+				log.Fatal(err)
+			}
+			amountSl = append(amountSl, i)
+		}
+
+		remaining := len(tagSl) - len(amountSl)
+		for i := 0; i < remaining; i++ {
+			amountSl = append(amountSl, 10)
+		}
+	}
+	if tags != "" {
+		generateimage.GenerateImages(tagSl, amountSl)
+	}
+
+	if runServer {
+		startServer()
+	}
 }
