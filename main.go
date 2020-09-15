@@ -115,8 +115,8 @@ func main() {
 	var tags, amount string
 	var runServer bool
 
-	flag.StringVar(&tags, "tags", "nature", "tags of images to match\nvalue must be comma sepearated with no space")
-	flag.StringVar(&amount, "amount", "10", "number of images of each tag to generate\nvalue must be comma sepearated with no space")
+	flag.StringVar(&tags, "tags", "", "tags of images to match\nvalue must be comma sepearated with no space")
+	flag.StringVar(&amount, "amount", "", "number of images of each tag to generate\nvalue must be comma sepearated with no space")
 	flag.BoolVar(&runServer, "run", false, "run server")
 
 	flag.Usage = func() {
