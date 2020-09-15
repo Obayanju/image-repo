@@ -1,7 +1,7 @@
 # image-repo
-Search and manage images
+Search images
 
-# QuickStart
+## QuickStart
 - Clone the repo using `git clone https://github.com/Obayanju/image-repo.git`
 - Get your Pixabay API key
 	- Sign up at [url](https://pixabay.com/accounts/register/?source=main_nav)
